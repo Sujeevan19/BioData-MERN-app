@@ -1,50 +1,61 @@
-import { useState } from "react"
-import API from "../services/api"
+import { useState } from "react";
+import API from "../services/api";
 
-function Login(){
+function Login({ onLoginSuccess }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-const [email,setEmail] = useState("")
-const [password,setPassword] = useState("")
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-const handleLogin = async(e)=>{
+    try {
+      const res = await API.post("/api/login", { email, password });
+      localStorage.setItem("token", res.data.token);
+      if (onLoginSuccess) {
+        onLoginSuccess();
+      }
+      alert("Login successful");
+    } catch (err) {
+      console.error(err);
+      alert("Login failed. Please check your credentials.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    e.preventDefault()
+  return (
+    <form className="form" onSubmit={handleLogin}>
+      <div className="form-field">
+        <label>Email</label>
+        <input
+          className="input"
+          placeholder="you@example.com"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
 
-    const res = await API.post("/api/login",{email,password})
+      <div className="form-field">
+        <label>Password</label>
+        <input
+          className="input"
+          type="password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+      </div>
 
-    localStorage.setItem("token",res.data.token)
-
-    alert("Login successful")
-
+      <button className="btn btn-primary full-width" disabled={loading}>
+        {loading ? "Logging in..." : "Login"}
+      </button>
+    </form>
+  );
 }
 
-return(
-
-<div>
-
-<h2>Login</h2>
-
-<form onSubmit={handleLogin}>
-
-<input
-placeholder="Email"
-onChange={e=>setEmail(e.target.value)}
-/>
-
-<input
-type="password"
-placeholder="Password"
-onChange={e=>setPassword(e.target.value)}
-/>
-
-<button>Login</button>
-
-</form>
-
-</div>
-
-)
-
-}
-
-export default Login
+export default Login;

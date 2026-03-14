@@ -1,48 +1,72 @@
-import {useState} from "react"
-import API from "../services/api"
+import { useState } from "react";
+import API from "../services/api";
 
-function Register(){
+function Register() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-const [form,setForm] = useState({
-name:"",
-email:"",
-password:""
-})
+  const submit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-const submit = async(e)=>{
-e.preventDefault()
+    try {
+      await API.post("/api/register", form);
+      alert("User registered successfully");
+      setForm({ name: "", email: "", password: "" });
+    } catch (err) {
+      console.error(err);
+      alert("Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-await API.post("/api/register",form)
+  return (
+    <form className="form" onSubmit={submit}>
+      <div className="form-field">
+        <label>Name</label>
+        <input
+          className="input"
+          placeholder="Your name"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          required
+        />
+      </div>
 
-alert("User Registered")
+      <div className="form-field">
+        <label>Email</label>
+        <input
+          className="input"
+          type="email"
+          placeholder="you@example.com"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          required
+        />
+      </div>
+
+      <div className="form-field">
+        <label>Password</label>
+        <input
+          className="input"
+          type="password"
+          placeholder="Create a password"
+          value={form.password}
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
+          required
+        />
+      </div>
+
+      <button className="btn btn-outline full-width" disabled={loading}>
+        {loading ? "Registering..." : "Register"}
+      </button>
+    </form>
+  );
 }
 
-return(
-
-<div>
-
-<h2>Register</h2>
-
-<form onSubmit={submit}>
-
-<input placeholder="Name"
-onChange={e=>setForm({...form,name:e.target.value})}/>
-
-<input placeholder="Email"
-onChange={e=>setForm({...form,email:e.target.value})}/>
-
-<input placeholder="Password"
-type="password"
-onChange={e=>setForm({...form,password:e.target.value})}/>
-
-<button>Register</button>
-
-</form>
-
-</div>
-
-)
-
-}
-
-export default Register
+export default Register;

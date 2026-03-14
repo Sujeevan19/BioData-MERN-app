@@ -1,57 +1,100 @@
-import {useState} from "react"
-import API from "../services/api"
+import { useState } from "react";
+import API from "../services/api";
 
-function BioForm(){
+function BioForm() {
+  const [form, setForm] = useState({
+    name: "",
+    age: "",
+    gender: "",
+    phone: "",
+    address: "",
+  });
+  const [loading, setLoading] = useState(false);
 
-const [form,setForm] = useState({
-name:"",
-age:"",
-gender:"",
-phone:"",
-address:""
-})
+  const submit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-const submit = async(e)=>{
+    try {
+      await API.post("/bio-api", form);
+      alert("Bio added");
+      setForm({
+        name: "",
+        age: "",
+        gender: "",
+        phone: "",
+        address: "",
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add bio. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-e.preventDefault()
+  return (
+    <form className="form" onSubmit={submit}>
+      <div className="form-grid">
+        <div className="form-field">
+          <label>Name</label>
+          <input
+            className="input"
+            placeholder="Full name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
+        </div>
 
-await API.post("/bio-api",form)
+        <div className="form-field">
+          <label>Age</label>
+          <input
+            className="input"
+            type="number"
+            placeholder="Age"
+            value={form.age}
+            onChange={(e) => setForm({ ...form, age: e.target.value })}
+            required
+          />
+        </div>
 
-alert("Bio added")
+        <div className="form-field">
+          <label>Gender</label>
+          <input
+            className="input"
+            placeholder="Gender"
+            value={form.gender}
+            onChange={(e) => setForm({ ...form, gender: e.target.value })}
+          />
+        </div>
 
+        <div className="form-field">
+          <label>Phone</label>
+          <input
+            className="input"
+            placeholder="Phone number"
+            value={form.phone}
+            onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          />
+        </div>
+      </div>
+
+      <div className="form-field">
+        <label>Address</label>
+        <input
+          className="input"
+          placeholder="Address"
+          value={form.address}
+          onChange={(e) => setForm({ ...form, address: e.target.value })}
+        />
+      </div>
+
+      <button className="btn btn-primary" disabled={loading}>
+        {loading ? "Saving..." : "Add Bio"}
+      </button>
+    </form>
+  );
 }
 
-return(
-
-<div>
-
-<h2>Add Bio</h2>
-
-<form onSubmit={submit}>
-
-<input placeholder="Name"
-onChange={e=>setForm({...form,name:e.target.value})}/>
-
-<input placeholder="Age"
-onChange={e=>setForm({...form,age:e.target.value})}/>
-
-<input placeholder="Gender"
-onChange={e=>setForm({...form,gender:e.target.value})}/>
-
-<input placeholder="Phone"
-onChange={e=>setForm({...form,phone:e.target.value})}/>
-
-<input placeholder="Address"
-onChange={e=>setForm({...form,address:e.target.value})}/>
-
-<button>Add Bio</button>
-
-</form>
-
-</div>
-
-)
-
-}
-
-export default BioForm
+export default BioForm;
